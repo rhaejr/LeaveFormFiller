@@ -1,6 +1,7 @@
 from fdfgen import forge_fdf
 import subprocess
 import datetime as dt
+import sqlite3
 NAME = "form1[0].#subform[0].Table1[0].Row2[0].TextField[0]"
 SSN = "form1[0].#subform[0].Table1[0].Row2[0].TextField[1]"
 ORGANIZATION = "form1[0].#subform[0].Table1[0].Row4[0].TextField[0]"
@@ -110,5 +111,34 @@ def hours_of_leave(from_time, to_time):
     to_time = dt.datetime.strptime(to_time, "%H%M")
     delta = to_time - from_time
     return int((delta.total_seconds() / minutes) / hours)
-print(hours_in_day(test))
-print(hours_of_leave("0700", "1630"))
+# print(hours_in_day(test))
+# print(hours_of_leave("0700", "1630"))
+
+conn = sqlite3.connect("users.db")
+cur = conn.cursor()
+
+# conn.execute('''CREATE TABLE IF NOT EXISTS users
+# (ID INT PRIMARY KEY      NOT NULL,
+# NAME    TEXT NOT NULL);''')
+
+cur.execute('''SELECT * FROM users''')
+rows = cur.fetchall()
+print(rows[0][1])
+
+# for row in rows:
+#     print(row)
+
+conn.close()
+# print("sucess")
+
+# conn = sqlite3.connect("test.db")
+#
+# conn.execute('''CREATE TABLE IF NOT EXISTS leave_forms
+# (ID INT PRIMARY KEY      NOT NULL,
+# NAME    TEXT NOT NULL);''')
+# conn.close()
+
+
+
+
+

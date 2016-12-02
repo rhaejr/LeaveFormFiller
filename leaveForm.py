@@ -4,6 +4,10 @@ import subprocess
 from PyQt4 import QtCore, QtGui
 import sys
 import os
+import sqlite3
+
+
+
 # Constants
 NAME = "form1[0].#subform[0].Table1[0].Row2[0].TextField[0]"
 SSN = "form1[0].#subform[0].Table1[0].Row2[0].TextField[1]"
@@ -51,6 +55,12 @@ SIGN_DATE = "form1[0].#subform[0].Table8[0].Row5[0].DateTimeField25[0]"
 PAYDAY = "10-Nov-2016"
 MISS_MONDAY = "07-Nov-2016"
 
+conn = sqlite3.connect('users.db')
+cur = conn.cursor()
+cur.execute('''CREATE TABLE IF NOT EXISTS users
+(ID INT PRIMARY KEY      NOT NULL,
+NAME    TEXT NOT NULL);''')
+
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -69,6 +79,8 @@ except AttributeError:
 
 class LeaveForm:
     def __init__(self,gui):
+        self.name = ""
+        self.ssn = ""
         self.gui = gui
         self.fields = []
         self.from_date = ""
@@ -132,6 +144,42 @@ class Ui_Form(object):
         Form.resize(787, 601)
         self.verticalLayout_3 = QtGui.QVBoxLayout(Form)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
+        self.label_6 = QtGui.QLabel(Form)
+        self.label_6.setObjectName(_fromUtf8("label_6"))
+        self.verticalLayout_3.addWidget(self.label_6)
+        self.user_list = QtGui.QComboBox(Form)
+        self.user_list.setObjectName(_fromUtf8("user_list"))
+        self.verticalLayout_3.addWidget(self.user_list)
+        self.horizontalLayout_4 = QtGui.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.verticalLayout_4 = QtGui.QVBoxLayout()
+        self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
+        self.label_4 = QtGui.QLabel(Form)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.verticalLayout_4.addWidget(self.label_4)
+        self.add_last4_line = QtGui.QLineEdit(Form)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.add_last4_line.sizePolicy().hasHeightForWidth())
+        self.add_last4_line.setSizePolicy(sizePolicy)
+        self.add_last4_line.setMaximumSize(QtCore.QSize(326, 16777215))
+        self.add_last4_line.setObjectName(_fromUtf8("add_last4_line"))
+        self.verticalLayout_4.addWidget(self.add_last4_line)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_4)
+        self.verticalLayout_5 = QtGui.QVBoxLayout()
+        self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
+        self.label_5 = QtGui.QLabel(Form)
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+        self.verticalLayout_5.addWidget(self.label_5)
+        self.add_name_line = QtGui.QLineEdit(Form)
+        self.add_name_line.setObjectName(_fromUtf8("add_name_line"))
+        self.verticalLayout_5.addWidget(self.add_name_line)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_5)
+        self.add_submit_btn = QtGui.QPushButton(Form)
+        self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
+        self.horizontalLayout_4.addWidget(self.add_submit_btn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.horizontalLayout = QtGui.QHBoxLayout()
@@ -218,15 +266,18 @@ class Ui_Form(object):
         self.verticalLayout_3.addWidget(self.remarksText)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
-        self.connections()
-        self.defaults()
-        self.logic()
+
+        self.non_generated_code()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(_translate("Form", "Form", None))
+        self.label_6.setText(_translate("Form", "Select Name", None))
+        self.label_4.setText(_translate("Form", "Last 4", None))
+        self.label_5.setText(_translate("Form", "Name", None))
+        self.add_submit_btn.setText(_translate("Form", "Add", None))
         self.label_2.setText(_translate("Form", "From", None))
         self.from_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
         self.label.setText(_translate("Form", "To", None))
@@ -241,6 +292,12 @@ class Ui_Form(object):
         self.submit_btn.setText(_translate("Form", "Submit", None))
         self.remarksLabel.setText(_translate("Form", "Remarks:", None))
 
+    def non_generated_code(self):
+        self.connections()
+        self.defaults()
+        self.logic()
+        self.fill_drop_down()
+
     # noinspection PyUnresolvedReferences
     def connections(self):
 
@@ -252,6 +309,7 @@ class Ui_Form(object):
         self.radio_annual.clicked.connect(self.logic)
         self.from_time.timeChanged.connect(self.update_hours)
         self.to_time.timeChanged.connect(self.update_hours)
+        self.add_submit_btn.clicked.connect(self.add_user)
 
     def defaults(self):
         self.from_date.setDate(QtCore.QDate.currentDate())
@@ -282,6 +340,28 @@ class Ui_Form(object):
         from_time = self.from_time.time().toPyTime().strftime("%H%M")
         to_time = self.to_time.time().toPyTime().strftime("%H%M")
         self.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time,to_time),0,0))
+
+    def add_user(self):
+
+        name = self.add_name_line.text()
+        ssn = self.add_last4_line.text()
+        try:
+            cur.execute("INSERT INTO users VALUES("+ssn+", '"+name+"')")
+            conn.commit()
+            self.user_list.clear()
+            self.fill_drop_down()
+        except sqlite3.IntegrityError:
+            print('User already enrolled')
+
+
+    def fill_drop_down(self):
+        cur.execute('''SELECT * FROM users''')
+        rows = cur.fetchall()
+
+        for row in rows:
+            self.user_list.addItem(row[1] + " " +str(row[0]))
+
+
 
 
 # Determines hours_in_day of a day assuming normal work schedule
