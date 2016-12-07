@@ -5,6 +5,8 @@ from PyQt4 import QtCore, QtGui
 import sys
 import os
 import sqlite3
+from collections import OrderedDict
+from pypdftk import fill_form
 
 
 
@@ -57,9 +59,25 @@ MISS_MONDAY = "07-Nov-2016"
 
 conn = sqlite3.connect('users.db')
 cur = conn.cursor()
-cur.execute('''CREATE TABLE IF NOT EXISTS users
-(ID INT PRIMARY KEY      NOT NULL,
-NAME    TEXT NOT NULL);''')
+cur.execute('''CREATE TABLE IF NOT EXISTS users(
+ssn INT PRIMARY KEY      NOT NULL,
+last    TEXT NOT NULL,
+first    TEXT NOT NULL,
+middle    TEXT NOT NULL
+);''')
+
+cur.execute('''CREATE TABLE IF NOT EXISTS leave_forms(
+id      INT     NOT NULL,
+from_date TEXT    NOT NULL,
+to_date     TEXT    NOT NULL,
+from_time   TEXT    NOT NULL,
+to_time     TEXT    NOT NULL,
+leave_type  TEXT    NOT NULL,
+remarks TEXT    NOT NULL,
+signed TEXT    NOT NULL,
+hours INT    NOT NULL,
+FOREIGN KEY(id) REFERENCES users(ssn)
+);''')
 
 
 try:
@@ -82,7 +100,7 @@ class LeaveForm:
         self.name = ""
         self.ssn = ""
         self.gui = gui
-        self.fields = []
+        self.datas = {}
         self.from_date = ""
         self.to_date = ""
         self.from_time = ""
@@ -93,49 +111,56 @@ class LeaveForm:
         self.hours = ""
 
     def fill_fields(self):
-
-        self.fields.append((REMARKS, self.remarks))
+        self.datas = {REMARKS: self.remarks, NAME: self.name, SSN: self.ssn}
 
         if self.gui.radio_annual.isChecked():
-            self.fields.append((ANNUAL_FROM_DATE,self.from_date))
-            self.fields.append((ANNUAL_TO_DATE, self.to_date))
-            self.fields.append((ANNUAL_BOX, 1))
-            self.fields.append((ANNUAL_FROM_TIME, self.from_time))
-            self.fields.append((ANNUAL_TO_TIME, self.to_time))
-            self.fields.append((ANNUAL_TOTAL, self.hours))
+            self.datas[ANNUAL_FROM_DATE] = self.from_date
+            self.datas[ANNUAL_TO_DATE] = self.to_date
+            self.datas[ANNUAL_BOX] = "1"
+            self.datas[ANNUAL_FROM_TIME] = self.from_time
+            self.datas[ANNUAL_TO_TIME] = self.to_time
+            self.datas[ANNUAL_TOTAL] = self.hours
+            self.leave_type = "Annual"
 
         elif self.gui.radio_sick.isChecked():
-            self.fields.append((SICK_FROM_DATE,self.from_date))
-            self.fields.append((SICK_TO_DATE, self.to_date))
-            self.fields.append((SICK_BOX, 1))
-            self.fields.append((SICK_FROM_TIME, self.from_time))
-            self.fields.append((SICK_TO_TIME, self.to_time))
-            self.fields.append((SICK_TOTAL, self.hours))
+            self.datas[SICK_FROM_DATE] = self.from_date
+            self.datas[SICK_TO_DATE] = self.to_date
+            self.datas[SICK_BOX] = "1"
+            self.datas[SICK_FROM_TIME] = self.from_time
+            self.datas[SICK_TO_TIME] = self.to_time
+            self.datas[SICK_TOTAL] = self.hours
+            self.leave_type = "Sick"
 
 
         elif self.gui.radio_lwop.isChecked():
-            self.fields.append((LWOP_FROM_DATE, self.from_date))
-            self.fields.append((LWOP_TO_DATE, self.to_date))
-            self.fields.append((LWOP_BOX, 1))
-            self.fields.append((LWOP_FROM_TIME, self.from_time))
-            self.fields.append((LWOP_TO_TIME, self.to_time))
-            self.fields.append((LWOP_TOTAL, self.hours))
+            self.datas[LWOP_FROM_DATE] = self.from_date
+            self.datas[LWOP_TO_DATE] = self.to_date
+            self.datas[LWOP_BOX] = "1"
+            self.datas[LWOP_FROM_TIME] = self.from_time
+            self.datas[LWOP_TO_TIME] = self.to_time
+            self.datas[LWOP_TOTAL] = self.hours
+            self.leave_type = "LWOP"
 
         elif self.gui.radio_mil.isChecked():
-            self.fields.append((OTHER_FROM_DATE, self.from_date))
-            self.fields.append((OTHER_TO_DATE, self.to_date))
-            self.fields.append((OTHER_BOX, 1))
-            self.fields.append((OTHER_FROM_TIME, self.from_time))
-            self.fields.append((OTHER_TO_TIME, self.to_time))
-            self.fields.append((OTHER_TOTAL, self.hours))
+            self.datas[OTHER_FROM_DATE] = self.from_date
+            self.datas[OTHER_TO_DATE] = self.to_date
+            self.datas[OTHER_BOX] = "1"
+            self.datas[OTHER_FROM_TIME] = self.from_time
+            self.datas[OTHER_TO_TIME] = self.to_time
+            self.datas[OTHER_TOTAL] = self.hours
+            self.leave_type = "Millitary"
 
     def create_form(self):
+
         self.fill_fields()
-        fdf = forge_fdf("", self.fields, [], [], [])
-        fdf_file = open("data.fdf", "wb")
-        fdf_file.write(fdf)
-        fdf_file.close()
-        subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
+
+        # fdf = forge_fdf("", self.fields, [], [], [])
+        # fdf_file = open("data.fdf", "wb")
+        # fdf_file.write(fdf)
+        # fdf_file.close()
+        fill_form("leaveForm.pdf", self.datas)
+        # subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
+
 
 
 class Ui_Form(object):
@@ -172,10 +197,38 @@ class Ui_Form(object):
         self.label_5 = QtGui.QLabel(Form)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.verticalLayout_5.addWidget(self.label_5)
-        self.add_name_line = QtGui.QLineEdit(Form)
-        self.add_name_line.setObjectName(_fromUtf8("add_name_line"))
-        self.verticalLayout_5.addWidget(self.add_name_line)
+        self.add_last_line = QtGui.QLineEdit(Form)
+        self.add_last_line.setObjectName(_fromUtf8("add_last_line"))
+        self.verticalLayout_5.addWidget(self.add_last_line)
         self.horizontalLayout_4.addLayout(self.verticalLayout_5)
+        self.verticalLayout_6 = QtGui.QVBoxLayout()
+        self.verticalLayout_6.setObjectName(_fromUtf8("verticalLayout_6"))
+        self.label_7 = QtGui.QLabel(Form)
+        self.label_7.setObjectName(_fromUtf8("label_7"))
+        self.verticalLayout_6.addWidget(self.label_7)
+        self.add_first_line = QtGui.QLineEdit(Form)
+        self.add_first_line.setObjectName(_fromUtf8("add_first_line"))
+        self.verticalLayout_6.addWidget(self.add_first_line)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_6)
+        self.verticalLayout_7 = QtGui.QVBoxLayout()
+        self.verticalLayout_7.setObjectName(_fromUtf8("verticalLayout_7"))
+        self.label_8 = QtGui.QLabel(Form)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
+        self.label_8.setSizePolicy(sizePolicy)
+        self.label_8.setObjectName(_fromUtf8("label_8"))
+        self.verticalLayout_7.addWidget(self.label_8)
+        self.add_middle_line = QtGui.QLineEdit(Form)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.add_middle_line.sizePolicy().hasHeightForWidth())
+        self.add_middle_line.setSizePolicy(sizePolicy)
+        self.add_middle_line.setObjectName(_fromUtf8("add_middle_line"))
+        self.verticalLayout_7.addWidget(self.add_middle_line)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_7)
         self.add_submit_btn = QtGui.QPushButton(Form)
         self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
         self.horizontalLayout_4.addWidget(self.add_submit_btn)
@@ -264,6 +317,11 @@ class Ui_Form(object):
         self.remarksText.setMaximumSize(QtCore.QSize(16777215, 50))
         self.remarksText.setObjectName(_fromUtf8("remarksText"))
         self.verticalLayout_3.addWidget(self.remarksText)
+        self.form_table = QtGui.QTableWidget(Form)
+        self.form_table.setObjectName(_fromUtf8("form_table"))
+        self.form_table.setColumnCount(0)
+        self.form_table.setRowCount(0)
+        self.verticalLayout_3.addWidget(self.form_table)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
 
@@ -276,7 +334,9 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Form", None))
         self.label_6.setText(_translate("Form", "Select Name", None))
         self.label_4.setText(_translate("Form", "Last 4", None))
-        self.label_5.setText(_translate("Form", "Name", None))
+        self.label_5.setText(_translate("Form", "last Name:", None))
+        self.label_7.setText(_translate("Form", "First Name:", None))
+        self.label_8.setText(_translate("Form", "Middle Initial", None))
         self.add_submit_btn.setText(_translate("Form", "Add", None))
         self.label_2.setText(_translate("Form", "From", None))
         self.from_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
@@ -297,6 +357,8 @@ class Ui_Form(object):
         self.defaults()
         self.logic()
         self.fill_drop_down()
+        self.leave_form = LeaveForm(self)
+        # self.user_table()
 
     # noinspection PyUnresolvedReferences
     def connections(self):
@@ -310,23 +372,49 @@ class Ui_Form(object):
         self.from_time.timeChanged.connect(self.update_hours)
         self.to_time.timeChanged.connect(self.update_hours)
         self.add_submit_btn.clicked.connect(self.add_user)
+        self.user_list.activated[str].connect(self.user_select)
 
     def defaults(self):
         self.from_date.setDate(QtCore.QDate.currentDate())
         self.to_date.setDate(QtCore.QDate.currentDate())
         self.from_time.setTime(QtCore.QTime(7, 0, 0))
         self.to_time.setTime(QtCore.QTime(16, 30, 0))
+        self.user_dict = {}
+        self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[0]))
 
     def submit_leave(self):
-        leave_form = LeaveForm(self)
-        leave_form.from_date = self.from_date.date().toPyDate().strftime("%d-%b-%Y")
-        leave_form.to_date = self.to_date.date().toPyDate().strftime("%d-%b-%Y")
-        leave_form.from_time = self.from_time.time().toPyTime().strftime("%H%M")
-        leave_form.to_time = self.to_time.time().toPyTime().strftime("%H%M")
-        leave_form.remarks = self.remarksText.toPlainText()
-        leave_form.hours = self.total_hours.time().toPyTime().strftime("%H")
-        leave_form.create_form()
+
+        self.leave_form.from_date = self.from_date.date().toPyDate().strftime("%d-%b-%Y")
+        self.leave_form.to_date = self.to_date.date().toPyDate().strftime("%d-%b-%Y")
+        self.leave_form.from_time = self.from_time.time().toPyTime().strftime("%H%M")
+        self.leave_form.to_time = self.to_time.time().toPyTime().strftime("%H%M")
+        self.leave_form.remarks = self.remarksText.toPlainText()
+        self.leave_form.hours = self.total_hours.time().toPyTime().strftime("%H")
+        self.leave_form.leave_type = ""
+        self.leave_form.signed = ""
+        self.leave_form.create_form()
+        cur.execute('''INSERT INTO leave_forms VALUES(
+        {0},
+        '{1}',
+        '{2}',
+        '{3}',
+        '{4}',
+        '{5}',
+        '{6}',
+        '{7}',
+        '{8}')'''.format(self.leave_form.ssn,
+                         self.leave_form.from_date,
+                         self.leave_form.to_date,
+                         self.leave_form.from_time,
+                         self.leave_form.to_time,
+                         self.leave_form.leave_type,
+                         self.leave_form.remarks,
+                         self.leave_form.signed,
+                         self.leave_form.hours))
+        conn.commit()
+
         os.system("start output.pdf")
+
 
     def logic(self):
         if self.check_aftp.isChecked():
@@ -343,23 +431,52 @@ class Ui_Form(object):
 
     def add_user(self):
 
-        name = self.add_name_line.text()
+        first = self.add_first_line.text()
+        last = self.add_last_line.text()
+        middle = self.add_middle_line.text()
         ssn = self.add_last4_line.text()
+
         try:
-            cur.execute("INSERT INTO users VALUES("+ssn+", '"+name+"')")
+            print("INSERT INTO users VALUES("+ssn+", '"+last+"', '"+first+"', '"+middle+"')")
+            cur.execute("INSERT INTO users VALUES("+ssn+", '"+last+"', '"+first+"', '"+middle+"')")
             conn.commit()
             self.user_list.clear()
             self.fill_drop_down()
         except sqlite3.IntegrityError:
             print('User already enrolled')
 
-
     def fill_drop_down(self):
         cur.execute('''SELECT * FROM users''')
         rows = cur.fetchall()
+        for row in rows:
+            # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
+            self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1],row[2],row[3], str(row[0]))
+        self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
+        for key in self.user_dict:
+            self.user_list.addItem(self.user_dict[key])
+
+
+    def user_select(self, text):
+        self.leave_form.name, self.leave_form.ssn = text.split(' - ')
+        cur.execute("SELECT * FROM leave_forms WHERE ID="+self.leave_form.ssn)
+        rows = cur.fetchall()
+        self.form_table.setRowCount(len(rows))
+        try:
+            self.form_table.setColumnCount(len(rows[0]))
+        except IndexError:
+            self.form_table.setColumnCount(11)
+        row_num = 0
+        for row in rows:
+            column = 0
+            for cell in row:
+                self.form_table.setItem(row_num,column,QtGui.QTableWidgetItem(str(cell)))
+                column+=1
+            row_num+=1
 
         for row in rows:
-            self.user_list.addItem(row[1] + " " +str(row[0]))
+            print(row)
+
+
 
 
 

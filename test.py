@@ -117,9 +117,9 @@ def hours_of_leave(from_time, to_time):
 conn = sqlite3.connect("users.db")
 cur = conn.cursor()
 
-# conn.execute('''CREATE TABLE IF NOT EXISTS users
-# (ID INT PRIMARY KEY      NOT NULL,
-# NAME    TEXT NOT NULL);''')
+conn.execute('''CREATE TABLE IF NOT EXISTS users
+(ID INT PRIMARY KEY      NOT NULL,
+NAME    TEXT NOT NULL);''')
 
 cur.execute('''SELECT * FROM users''')
 rows = cur.fetchall()
@@ -128,15 +128,43 @@ print(rows[0][1])
 # for row in rows:
 #     print(row)
 
-conn.close()
+# conn.close()
 # print("sucess")
 
-# conn = sqlite3.connect("test.db")
-#
-# conn.execute('''CREATE TABLE IF NOT EXISTS leave_forms
-# (ID INT PRIMARY KEY      NOT NULL,
-# NAME    TEXT NOT NULL);''')
-# conn.close()
+# conn = sqlite3.connect("users.db")
+
+conn.execute('''CREATE TABLE IF NOT EXISTS leave_forms(
+ID      INT     NOT NULL,
+name    TEXT    NOT NULL,
+ssn     TEXT    NOT NULL,
+from_date TEXT    NOT NULL,
+to_date     TEXT    NOT NULL,
+from_time   TEXT    NOT NULL,
+to_time     TEXT    NOT NULL,
+leave_type  TEXT    NOT NULL,
+remarks TEXT    NOT NULL,
+signed TEXT    NOT NULL,
+hours INT    NOT NULL,
+FOREIGN KEY(ID) REFERENCES users(ID)
+);''')
+
+# cur.execute('''INSERT INTO leave_forms VALUES(
+# 9486,
+# 'from_date',
+# 'to_date',
+# 'from_time',
+# 'to_time',
+# 'leave_type',
+# 'remarks',
+# 'signed',
+# 'hours')''')
+
+cur.execute('''SELECT * FROM leave_forms WHERE id = 9486 ''')
+rows = cur.fetchall()
+for row in rows:
+    print(row)
+conn.commit()
+conn.close()
 
 
 

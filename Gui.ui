@@ -58,12 +58,53 @@
        <item>
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Name</string>
+          <string>last Name:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="add_name_line"/>
+        <widget class="QLineEdit" name="add_last_line"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>First Name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="add_first_line"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Middle Initial</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="add_middle_line">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -246,6 +287,9 @@
       </size>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="form_table"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
