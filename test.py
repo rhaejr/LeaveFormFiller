@@ -166,7 +166,62 @@ for row in rows:
 conn.commit()
 conn.close()
 
+import pypdftk
+
+data = {
+    NAME: 'Julien',
+}
+
+poop = pypdftk.fill_form("leaveForm.pdf",data,"output.pdf")
 
 
-
-
+# def fill_fields(self):
+#     self.datas = {REMARKS: self.remarks, NAME: self.name, SSN: self.ssn}
+#
+#     if self.gui.radio_annual.isChecked():
+#         self.datas[ANNUAL_FROM_DATE] = self.from_date
+#         self.datas[ANNUAL_TO_DATE] = self.to_date
+#         self.datas[ANNUAL_BOX] = "1"
+#         self.datas[ANNUAL_FROM_TIME] = self.from_time
+#         self.datas[ANNUAL_TO_TIME] = self.to_time
+#         self.datas[ANNUAL_TOTAL] = self.hours
+#         self.leave_type = "Annual"
+#
+#     elif self.gui.radio_sick.isChecked():
+#         self.datas[SICK_FROM_DATE] = self.from_date
+#         self.datas[SICK_TO_DATE] = self.to_date
+#         self.datas[SICK_BOX] = "1"
+#         self.datas[SICK_FROM_TIME] = self.from_time
+#         self.datas[SICK_TO_TIME] = self.to_time
+#         self.datas[SICK_TOTAL] = self.hours
+#         self.leave_type = "Sick"
+#
+#
+#     elif self.gui.radio_lwop.isChecked():
+#         self.datas[LWOP_FROM_DATE] = self.from_date
+#         self.datas[LWOP_TO_DATE] = self.to_date
+#         self.datas[LWOP_BOX] = "1"
+#         self.datas[LWOP_FROM_TIME] = self.from_time
+#         self.datas[LWOP_TO_TIME] = self.to_time
+#         self.datas[LWOP_TOTAL] = self.hours
+#         self.leave_type = "LWOP"
+#
+#     elif self.gui.radio_mil.isChecked():
+#         self.datas[OTHER_FROM_DATE] = self.from_date
+#         self.datas[OTHER_TO_DATE] = self.to_date
+#         self.datas[OTHER_BOX] = "1"
+#         self.datas[OTHER_FROM_TIME] = self.from_time
+#         self.datas[OTHER_TO_TIME] = self.to_time
+#         self.datas[OTHER_TOTAL] = self.hours
+#         self.leave_type = "Millitary"
+#
+#
+# def create_form(self):
+#     self.fill_fields()
+#
+#     # fdf = forge_fdf("", self.fields, [], [], [])
+#     # fdf_file = open("data.fdf", "wb")
+#     # fdf_file.write(fdf)
+#     # fdf_file.close()
+#     fill_form("leaveForm.pdf", self.datas, "output.pdf")
+#     # subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])

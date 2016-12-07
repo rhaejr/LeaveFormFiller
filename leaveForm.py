@@ -100,7 +100,7 @@ class LeaveForm:
         self.name = ""
         self.ssn = ""
         self.gui = gui
-        self.datas = {}
+        self.datas = []
         self.from_date = ""
         self.to_date = ""
         self.from_time = ""
@@ -111,55 +111,51 @@ class LeaveForm:
         self.hours = ""
 
     def fill_fields(self):
-        self.datas = {REMARKS: self.remarks, NAME: self.name, SSN: self.ssn}
+
+        self.datas.append((REMARKS, self.remarks))
+        self.datas.append((NAME, self.name))
+        self.datas.append((SSN, self.ssn))
 
         if self.gui.radio_annual.isChecked():
-            self.datas[ANNUAL_FROM_DATE] = self.from_date
-            self.datas[ANNUAL_TO_DATE] = self.to_date
-            self.datas[ANNUAL_BOX] = "1"
-            self.datas[ANNUAL_FROM_TIME] = self.from_time
-            self.datas[ANNUAL_TO_TIME] = self.to_time
-            self.datas[ANNUAL_TOTAL] = self.hours
-            self.leave_type = "Annual"
+            self.datas.append((ANNUAL_FROM_DATE,self.from_date))
+            self.datas.append((ANNUAL_TO_DATE, self.to_date))
+            self.datas.append((ANNUAL_BOX, 1))
+            self.datas.append((ANNUAL_FROM_TIME, self.from_time))
+            self.datas.append((ANNUAL_TO_TIME, self.to_time))
+            self.datas.append((ANNUAL_TOTAL, self.hours))
 
         elif self.gui.radio_sick.isChecked():
-            self.datas[SICK_FROM_DATE] = self.from_date
-            self.datas[SICK_TO_DATE] = self.to_date
-            self.datas[SICK_BOX] = "1"
-            self.datas[SICK_FROM_TIME] = self.from_time
-            self.datas[SICK_TO_TIME] = self.to_time
-            self.datas[SICK_TOTAL] = self.hours
-            self.leave_type = "Sick"
+            self.datas.append((SICK_FROM_DATE,self.from_date))
+            self.datas.append((SICK_TO_DATE, self.to_date))
+            self.datas.append((SICK_BOX, 1))
+            self.datas.append((SICK_FROM_TIME, self.from_time))
+            self.datas.append((SICK_TO_TIME, self.to_time))
+            self.datas.append((SICK_TOTAL, self.hours))
 
 
         elif self.gui.radio_lwop.isChecked():
-            self.datas[LWOP_FROM_DATE] = self.from_date
-            self.datas[LWOP_TO_DATE] = self.to_date
-            self.datas[LWOP_BOX] = "1"
-            self.datas[LWOP_FROM_TIME] = self.from_time
-            self.datas[LWOP_TO_TIME] = self.to_time
-            self.datas[LWOP_TOTAL] = self.hours
-            self.leave_type = "LWOP"
+            self.datas.append((LWOP_FROM_DATE, self.from_date))
+            self.datas.append((LWOP_TO_DATE, self.to_date))
+            self.datas.append((LWOP_BOX, 1))
+            self.datas.append((LWOP_FROM_TIME, self.from_time))
+            self.datas.append((LWOP_TO_TIME, self.to_time))
+            self.datas.append((LWOP_TOTAL, self.hours))
 
         elif self.gui.radio_mil.isChecked():
-            self.datas[OTHER_FROM_DATE] = self.from_date
-            self.datas[OTHER_TO_DATE] = self.to_date
-            self.datas[OTHER_BOX] = "1"
-            self.datas[OTHER_FROM_TIME] = self.from_time
-            self.datas[OTHER_TO_TIME] = self.to_time
-            self.datas[OTHER_TOTAL] = self.hours
-            self.leave_type = "Millitary"
+            self.datas.append((OTHER_FROM_DATE, self.from_date))
+            self.datas.append((OTHER_TO_DATE, self.to_date))
+            self.datas.append((OTHER_BOX, 1))
+            self.datas.append((OTHER_FROM_TIME, self.from_time))
+            self.datas.append((OTHER_TO_TIME, self.to_time))
+            self.datas.append((OTHER_TOTAL, self.hours))
 
     def create_form(self):
-
         self.fill_fields()
-
-        # fdf = forge_fdf("", self.fields, [], [], [])
-        # fdf_file = open("data.fdf", "wb")
-        # fdf_file.write(fdf)
-        # fdf_file.close()
-        fill_form("leaveForm.pdf", self.datas)
-        # subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
+        fdf = forge_fdf("", self.datas, [], [], [])
+        fdf_file = open("data.fdf", "wb")
+        fdf_file.write(fdf)
+        fdf_file.close()
+        subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
 
 
 
