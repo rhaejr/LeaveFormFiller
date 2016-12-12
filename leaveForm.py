@@ -417,7 +417,7 @@ class Ui_Form(object):
             self.remarksText.setPlainText("Military Leave for AFTP support")
             self.from_time.setTime(QtCore.QTime(14, 30, 0))
             self.to_time.setTime(QtCore.QTime(16, 30, 0))
-            self.radio_mil.setChecked(True)
+            # self.radio_mil.setChecked(True)
             self.remarksText.update()
 
     def update_hours(self):
@@ -433,13 +433,27 @@ class Ui_Form(object):
         ssn = self.add_last4_line.text()
 
         try:
-            print("INSERT INTO users VALUES("+ssn+", '"+last+"', '"+first+"', '"+middle+"')")
             cur.execute("INSERT INTO users VALUES("+ssn+", '"+last+"', '"+first+"', '"+middle+"')")
             conn.commit()
             self.user_list.clear()
             self.fill_drop_down()
         except sqlite3.IntegrityError:
-            print('User already enrolled')
+            self.update_user(ssn,last,first,middle)
+
+    def update_user(self,ssn,last,first,middle):
+        msg = QtGui.QMessageBox()
+        msg = QtGui.QMessageBox.question(msg,"User already enrolled!",
+                                         "Do you want to update the user?",
+                                         QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        if msg == QtGui.QMessageBox.Yes:
+            print("yes")
+            cur.execute("UPDATE users SET last=?, first=?, middle=? WHERE ssn=?",(last, first, middle, ssn))
+            conn.commit()
+            self.user_list.clear()
+            self.fill_drop_down()
+
+        else:
+            pass
 
     def fill_drop_down(self):
         cur.execute('''SELECT * FROM users''')
@@ -448,13 +462,17 @@ class Ui_Form(object):
             # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
             self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1],row[2],row[3], str(row[0]))
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
+        self.user_list.addItem("Select user...")
         for key in self.user_dict:
             self.user_list.addItem(self.user_dict[key])
 
 
     def user_select(self, text):
+        if text == "Select user...":
+            return
         self.leave_form.name, self.leave_form.ssn = text.split(' - ')
-        cur.execute("SELECT * FROM leave_forms WHERE ID="+self.leave_form.ssn)
+        cur.execute(
+            "SELECT from_date, to_date,from_time,to_time,leave_type,remarks,signed,hours  FROM leave_forms WHERE ID=" + self.leave_form.ssn)
         rows = cur.fetchall()
         self.form_table.setRowCount(len(rows))
         try:
@@ -465,12 +483,15 @@ class Ui_Form(object):
         for row in rows:
             column = 0
             for cell in row:
-                self.form_table.setItem(row_num,column,QtGui.QTableWidgetItem(str(cell)))
-                column+=1
-            row_num+=1
+                self.form_table.setItem(row_num, column, QtGui.QTableWidgetItem(str(cell)))
+                column += 1
+            row_num += 1
+        self.form_table.setHorizontalHeaderLabels(
+            ['from date', 'to date', 'from time', 'to time', 'leave type', 'remarks', 'signed', 'hours'])
 
-        for row in rows:
-            print(row)
+        # for row in rows:
+
+        #     print(row)
 
 
 

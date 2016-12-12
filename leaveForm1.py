@@ -456,8 +456,9 @@ class Ui_Form(object):
 
 
     def user_select(self, text):
+        list = ['from_date', 'to_date','from_time','to_time','leave_type','remarks','signed','hours']
         self.leave_form.name, self.leave_form.ssn = text.split(' - ')
-        cur.execute("SELECT * FROM leave_forms WHERE ID="+self.leave_form.ssn)
+        cur.execute("SELECT from_date, to_date,from_time,to_time,leave_type,remarks,signed,hours  FROM leave_forms WHERE ID="+self.leave_form.ssn)
         rows = cur.fetchall()
         self.form_table.setRowCount(len(rows))
         try:
@@ -471,9 +472,10 @@ class Ui_Form(object):
                 self.form_table.setItem(row_num,column,QtGui.QTableWidgetItem(str(cell)))
                 column+=1
             row_num+=1
+        self.form_table.setHorizontalHeaderLabels(['from date', 'to date','from time','to time','leave type','remarks','signed','hours'])
 
-        for row in rows:
-            print(row)
+        # for row in rows:
+        #     print(row)
 
 
 
