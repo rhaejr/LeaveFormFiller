@@ -6,9 +6,6 @@ import sys
 import os
 import sqlite3
 from collections import OrderedDict
-from pypdftk import fill_form
-
-
 
 # Constants
 NAME = "form1[0].#subform[0].Table1[0].Row2[0].TextField[0]"
@@ -63,7 +60,9 @@ cur.execute('''CREATE TABLE IF NOT EXISTS users(
 ssn INT PRIMARY KEY      NOT NULL,
 last    TEXT NOT NULL,
 first    TEXT NOT NULL,
-middle    TEXT NOT NULL
+middle    TEXT NOT NULL,
+grade TEXT NOT NULL,
+unit TEXT NOT NULL
 );''')
 
 cur.execute('''CREATE TABLE IF NOT EXISTS leave_forms(
@@ -79,7 +78,6 @@ hours INT    NOT NULL,
 FOREIGN KEY(id) REFERENCES users(ssn)
 );''')
 
-
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -88,6 +86,8 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
@@ -95,8 +95,17 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 
+class AftpSlip:
+    def create_form(self, datas):
+        fdf = forge_fdf("", datas, [], [], [])
+        fdf_file = open("data1.fdf", "wb")
+        fdf_file.write(fdf)
+        fdf_file.close()
+        subprocess.call(["pdftk", "AFTP.pdf", "fill_form", "data1.fdf", "output", "outputAFTP.pdf", "flatten"])
+
+
 class LeaveForm:
-    def __init__(self,gui):
+    def __init__(self, gui):
         self.name = ""
         self.ssn = ""
         self.gui = gui
@@ -117,7 +126,7 @@ class LeaveForm:
         self.datas.append((SSN, self.ssn))
 
         if self.gui.radio_annual.isChecked():
-            self.datas.append((ANNUAL_FROM_DATE,self.from_date))
+            self.datas.append((ANNUAL_FROM_DATE, self.from_date))
             self.datas.append((ANNUAL_TO_DATE, self.to_date))
             self.datas.append((ANNUAL_BOX, 1))
             self.datas.append((ANNUAL_FROM_TIME, self.from_time))
@@ -125,7 +134,7 @@ class LeaveForm:
             self.datas.append((ANNUAL_TOTAL, self.hours))
 
         elif self.gui.radio_sick.isChecked():
-            self.datas.append((SICK_FROM_DATE,self.from_date))
+            self.datas.append((SICK_FROM_DATE, self.from_date))
             self.datas.append((SICK_TO_DATE, self.to_date))
             self.datas.append((SICK_BOX, 1))
             self.datas.append((SICK_FROM_TIME, self.from_time))
@@ -158,7 +167,6 @@ class LeaveForm:
         subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
 
 
-
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
@@ -171,6 +179,8 @@ class Ui_Form(object):
         self.user_list = QtGui.QComboBox(Form)
         self.user_list.setObjectName(_fromUtf8("user_list"))
         self.verticalLayout_3.addWidget(self.user_list)
+        self.verticalLayout_9 = QtGui.QVBoxLayout()
+        self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         self.verticalLayout_4 = QtGui.QVBoxLayout()
@@ -225,10 +235,20 @@ class Ui_Form(object):
         self.add_middle_line.setObjectName(_fromUtf8("add_middle_line"))
         self.verticalLayout_7.addWidget(self.add_middle_line)
         self.horizontalLayout_4.addLayout(self.verticalLayout_7)
+        self.grade_drop = QtGui.QComboBox(Form)
+        self.grade_drop.setObjectName(_fromUtf8("grade_drop"))
+        self.horizontalLayout_4.addWidget(self.grade_drop)
         self.add_submit_btn = QtGui.QPushButton(Form)
         self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
         self.horizontalLayout_4.addWidget(self.add_submit_btn)
-        self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.verticalLayout_9.addLayout(self.horizontalLayout_4)
+        self.label_9 = QtGui.QLabel(Form)
+        self.label_9.setObjectName(_fromUtf8("label_9"))
+        self.verticalLayout_9.addWidget(self.label_9)
+        self.unit_edit = QtGui.QLineEdit(Form)
+        self.unit_edit.setObjectName(_fromUtf8("unit_edit"))
+        self.verticalLayout_9.addWidget(self.unit_edit)
+        self.verticalLayout_3.addLayout(self.verticalLayout_9)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.horizontalLayout = QtGui.QHBoxLayout()
@@ -261,6 +281,10 @@ class Ui_Form(object):
         self.verticalLayout.addWidget(self.to_time)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
+        self.verticalLayout_8 = QtGui.QVBoxLayout()
+        self.verticalLayout_8.setObjectName(_fromUtf8("verticalLayout_8"))
+        self.horizontalLayout_5 = QtGui.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
         self.check_aftp = QtGui.QCheckBox(Form)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -268,22 +292,36 @@ class Ui_Form(object):
         sizePolicy.setHeightForWidth(self.check_aftp.sizePolicy().hasHeightForWidth())
         self.check_aftp.setSizePolicy(sizePolicy)
         self.check_aftp.setObjectName(_fromUtf8("check_aftp"))
-        self.horizontalLayout_2.addWidget(self.check_aftp)
+        self.horizontalLayout_5.addWidget(self.check_aftp)
         self.gridLayout = QtGui.QGridLayout()
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.radio_annual = QtGui.QRadioButton(Form)
-        self.radio_annual.setObjectName(_fromUtf8("radio_annual"))
-        self.gridLayout.addWidget(self.radio_annual, 0, 0, 1, 1)
-        self.radio_mil = QtGui.QRadioButton(Form)
-        self.radio_mil.setObjectName(_fromUtf8("radio_mil"))
-        self.gridLayout.addWidget(self.radio_mil, 0, 1, 1, 1)
         self.radio_sick = QtGui.QRadioButton(Form)
         self.radio_sick.setObjectName(_fromUtf8("radio_sick"))
-        self.gridLayout.addWidget(self.radio_sick, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.radio_sick, 0, 3, 1, 1)
         self.radio_lwop = QtGui.QRadioButton(Form)
         self.radio_lwop.setObjectName(_fromUtf8("radio_lwop"))
-        self.gridLayout.addWidget(self.radio_lwop, 0, 3, 1, 1)
-        self.horizontalLayout_2.addLayout(self.gridLayout)
+        self.gridLayout.addWidget(self.radio_lwop, 0, 4, 1, 1)
+        self.radio_annual = QtGui.QRadioButton(Form)
+        self.radio_annual.setObjectName(_fromUtf8("radio_annual"))
+        self.gridLayout.addWidget(self.radio_annual, 0, 1, 1, 1)
+        self.radio_mil = QtGui.QRadioButton(Form)
+        self.radio_mil.setObjectName(_fromUtf8("radio_mil"))
+        self.gridLayout.addWidget(self.radio_mil, 0, 2, 1, 1)
+        self.horizontalLayout_5.addLayout(self.gridLayout)
+        self.verticalLayout_8.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_6 = QtGui.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.single_dual = QtGui.QComboBox(Form)
+        self.single_dual.setObjectName(_fromUtf8("single_dual"))
+        self.horizontalLayout_6.addWidget(self.single_dual)
+        self.aftp_code = QtGui.QComboBox(Form)
+        self.aftp_code.setObjectName(_fromUtf8("aftp_code"))
+        self.horizontalLayout_6.addWidget(self.aftp_code)
+        self.tng_code = QtGui.QComboBox(Form)
+        self.tng_code.setObjectName(_fromUtf8("tng_code"))
+        self.horizontalLayout_6.addWidget(self.tng_code)
+        self.verticalLayout_8.addLayout(self.horizontalLayout_6)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_8)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.label_3 = QtGui.QLabel(Form)
         self.label_3.setObjectName(_fromUtf8("label_3"))
@@ -321,10 +359,9 @@ class Ui_Form(object):
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
 
-        self.non_generated_code()
-
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
+        self.non_generated_code()
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(_translate("Form", "Form", None))
@@ -334,19 +371,23 @@ class Ui_Form(object):
         self.label_7.setText(_translate("Form", "First Name:", None))
         self.label_8.setText(_translate("Form", "Middle Initial", None))
         self.add_submit_btn.setText(_translate("Form", "Add", None))
+        self.label_9.setText(_translate("Form", "Unit", None))
         self.label_2.setText(_translate("Form", "From", None))
         self.from_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
         self.label.setText(_translate("Form", "To", None))
         self.to_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
         self.check_aftp.setText(_translate("Form", "AFTP", None))
-        self.radio_annual.setText(_translate("Form", "Annual", None))
-        self.radio_mil.setText(_translate("Form", "Military", None))
         self.radio_sick.setText(_translate("Form", "Sick", None))
         self.radio_lwop.setText(_translate("Form", "LWOP", None))
+        self.radio_annual.setText(_translate("Form", "Annual", None))
+        self.radio_mil.setText(_translate("Form", "Military", None))
         self.label_3.setText(_translate("Form", "Total Hours", None))
         self.total_hours.setDisplayFormat(_translate("Form", "h", None))
         self.submit_btn.setText(_translate("Form", "Submit", None))
         self.remarksLabel.setText(_translate("Form", "Remarks:", None))
+
+
+
 
     def non_generated_code(self):
         self.connections()
@@ -354,6 +395,7 @@ class Ui_Form(object):
         self.logic()
         self.fill_drop_down()
         self.leave_form = LeaveForm(self)
+        self.aftp_slip = AftpSlip()
         # self.user_table()
 
     # noinspection PyUnresolvedReferences
@@ -377,6 +419,16 @@ class Ui_Form(object):
         self.to_time.setTime(QtCore.QTime(16, 30, 0))
         self.user_dict = {}
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[0]))
+        self.single_dual.addItem("Periods...")
+        self.single_dual.addItems(["Single", "Dual"])
+        self.aftp_code.addItem("AFTP Code...")
+        self.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
+        self.tng_code.addItem("TNG Code...")
+        self.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
+        self.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
+                                  "WO1","CW2","CW3","CW4","CW5",
+                                  "O-1","O-2","O-3","O-4","O-5","O-6","O-7","O-8","O-9"])
+
 
     def submit_leave(self):
 
@@ -410,7 +462,71 @@ class Ui_Form(object):
         conn.commit()
 
         os.system("start output.pdf")
+        if self.check_aftp.isChecked():
+            a1 = self.aftp_code.currentText()
+            t1 = self.tng_code.currentText()
+            p1 = "X"
+            a2 = self.aftp_code.currentText()
+            t2 = self.tng_code.currentText()
+            p2 = "X"
+            p3 = ""
+            periods = self.single_dual.currentText()
 
+            if self.aftp_code.currentText() == "AFTP Code...":
+                a1, a2 = ("L", "L")
+            if self.tng_code.currentText() == "TNG Code...":
+                t1, t2 = ("SPT", "SPT")
+            if self.single_dual.currentText() == "Periods...":
+                periods = "Dual"
+            if periods == "Single":
+                a2, t2, p2, p3 = ("", "", "", "X")
+
+            cur.execute("SELECT grade, unit FROM users WHERE ssn=" + self.leave_form.ssn)
+            grade, unit = cur.fetchall()[0]
+
+            if day_of_week(self.leave_form.from_date) == "Thur":
+                if periods == "Single":
+                    from_time = "1630"
+                else:
+                    from_time = "1230"
+                to_time = "2100"
+
+            elif day_of_week(self.leave_form.from_date) == "Sun":
+                from_time = "0730"
+                if periods == "Single":
+                    to_time = "1130"
+                else:
+                    to_time = "1600"
+            else:
+                from_time = "1430"
+                to_time = "2300"
+
+
+
+            self.aftp_data = [
+                ("DATE", self.from_date.date().toPyDate().strftime("%d-%b-%Y")),
+                ("SINGLE_DUAL", periods),
+                ("FROM", from_time),
+                ("TO", to_time),
+                ("ORGANIZATION", unit),
+                ("SSN", self.leave_form.ssn),
+                ("GRADE", grade),
+                ("NAME", self.leave_form.name),
+                ("AFTP_CODE_1", a1),
+                ("AFTP_CODE_2", a2),
+                ("TNG_CODE_1", t1),
+                ("TNG_CODE_2", t2),
+                ("FLYING_TIME", ""),
+                ("FLYING_TIME_2", ""),
+                ("TAIL_1", ""),
+                ("TAIL_2", ""),
+                ("PAY", p1),
+                ("PAY_2", p2),
+                ("NON_PAY_1", ""),
+                ("NON_PAY_2]", "")]
+
+            self.aftp_slip.create_form(self.aftp_data)
+            os.system("start outputAFTP.pdf")
 
     def logic(self):
         if self.check_aftp.isChecked():
@@ -420,10 +536,11 @@ class Ui_Form(object):
             # self.radio_mil.setChecked(True)
             self.remarksText.update()
 
+
     def update_hours(self):
         from_time = self.from_time.time().toPyTime().strftime("%H%M")
         to_time = self.to_time.time().toPyTime().strftime("%H%M")
-        self.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time,to_time),0,0))
+        self.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time, to_time), 0, 0))
 
     def add_user(self):
 
@@ -431,23 +548,26 @@ class Ui_Form(object):
         last = self.add_last_line.text()
         middle = self.add_middle_line.text()
         ssn = self.add_last4_line.text()
+        grade = self.grade_drop.currentText()
+        unit = self.unit_edit.text()
 
         try:
-            cur.execute("INSERT INTO users VALUES("+ssn+", '"+last+"', '"+first+"', '"+middle+"')")
+            cur.execute("INSERT INTO users VALUES(" + ssn + ", '" + last + "', '" + first + "', '" + middle + "', '"
+                        + grade + "', '" + unit + "')")
             conn.commit()
             self.user_list.clear()
             self.fill_drop_down()
         except sqlite3.IntegrityError:
-            self.update_user(ssn,last,first,middle)
+            self.update_user(ssn, last, first, middle, grade, unit)
 
-    def update_user(self,ssn,last,first,middle):
+    def update_user(self, ssn, last, first, middle, grade, unit):
         msg = QtGui.QMessageBox()
-        msg = QtGui.QMessageBox.question(msg,"User already enrolled!",
+        msg = QtGui.QMessageBox.question(msg, "User already enrolled!",
                                          "Do you want to update the user?",
                                          QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
         if msg == QtGui.QMessageBox.Yes:
             print("yes")
-            cur.execute("UPDATE users SET last=?, first=?, middle=? WHERE ssn=?",(last, first, middle, ssn))
+            cur.execute("UPDATE users SET last=?, first=?, middle=?, grade=?, unit=? WHERE ssn=?", (last, first, middle, grade, unit, ssn))
             conn.commit()
             self.user_list.clear()
             self.fill_drop_down()
@@ -460,12 +580,11 @@ class Ui_Form(object):
         rows = cur.fetchall()
         for row in rows:
             # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
-            self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1],row[2],row[3], str(row[0]))
+            self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1], row[2], row[3], str(row[0]))
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
         self.user_list.addItem("Select user...")
         for key in self.user_dict:
             self.user_list.addItem(self.user_dict[key])
-
 
     def user_select(self, text):
         if text == "Select user...":
@@ -493,10 +612,15 @@ class Ui_Form(object):
 
         #     print(row)
 
-
-
-
-
+def day_of_week(date):
+    date = dt.datetime.strptime(date, "%d-%b-%Y")
+    miss_monday_start = dt.datetime.strptime("13-Nov-2016", "%d-%b-%Y")
+    delta = abs(date - miss_monday_start).days
+    days = [(0, "Sun"), (1, "Mon"), (2, "Tues"), (3, "Wed"), (4, "Thur"), (5, "Fri"), (6, "Sat"),
+            (7, "Sun"), (8, "Mon"), (9, "Tues"), (10, "Wed"), (11, "Thur"), (12, "Fri"), (13, "Sat")]
+    for day in days:
+        if delta % 14 == day[0]:
+            return str(day[1])
 
 # Determines hours_in_day of a day assuming normal work schedule
 # 13-Nov-2016 is start of pay period
@@ -510,10 +634,11 @@ def hours_in_day(date):
         if delta % 14 == day[0]:
             return str(day[1])
 
+
 def hours_of_leave(from_time, to_time):
     minutes = 60
     hours = 60
-    from_time = dt.datetime.strptime(from_time,"%H%M")
+    from_time = dt.datetime.strptime(from_time, "%H%M")
     to_time = dt.datetime.strptime(to_time, "%H%M")
     delta = to_time - from_time
     return int((delta.total_seconds() / minutes) / hours)

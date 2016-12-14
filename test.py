@@ -159,20 +159,20 @@ FOREIGN KEY(ID) REFERENCES users(ID)
 # 'signed',
 # 'hours')''')
 
-cur.execute('''SELECT * FROM leave_forms WHERE id = 9486 ''')
-rows = cur.fetchall()
-for row in rows:
-    print(row)
-conn.commit()
-conn.close()
+# cur.execute('''SELECT * FROM leave_forms WHERE id = 9486 ''')
+# rows = cur.fetchall()
+# for row in rows:
+#     print(row)
+# conn.commit()
+# conn.close()
+#
+# import pypdftk
+#
+# data = {
+#     NAME: 'Julien',
+# }
 
-import pypdftk
-
-data = {
-    NAME: 'Julien',
-}
-
-poop = pypdftk.fill_form("leaveForm.pdf",data,"output.pdf")
+# poop = pypdftk.fill_form("leaveForm.pdf",data,"output.pdf")
 
 
 # def fill_fields(self):
@@ -216,12 +216,45 @@ poop = pypdftk.fill_form("leaveForm.pdf",data,"output.pdf")
 #         self.leave_type = "Millitary"
 #
 #
-# def create_form(self):
-#     self.fill_fields()
-#
-#     # fdf = forge_fdf("", self.fields, [], [], [])
-#     # fdf_file = open("data.fdf", "wb")
-#     # fdf_file.write(fdf)
-#     # fdf_file.close()
-#     fill_form("leaveForm.pdf", self.datas, "output.pdf")
-#     # subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
+def create_form(field):
+
+    fdf = forge_fdf("", field, [], [], [])
+    fdf_file = open("data1.fdf", "wb")
+    fdf_file.write(fdf)
+    fdf_file.close()
+    # fill_form("leaveForm.pdf", self.datas, "output.pdf")
+    subprocess.call(["pdftk", "AFTP.pdf", "fill_form", "data1.fdf", "output", "outputAFTP.pdf", "flatten"])
+
+data = [("NAME", "Rhea"), ("SSN", "9486")]
+create_form(data)
+
+aftp = """
+DATE
+SINGLE_DUAL
+FROM
+TO
+ORGANIZATION
+SSN
+GRADE
+NAME
+AFTP_CODE_1
+AFTP_CODE_2
+TNG_CODE_1
+TNG_CODE_2
+FLYING_TIME
+FLYING_TIME_2
+TAIL_1
+TAIL_2
+PAY
+PAY_2
+NON_PAY_1
+NON_PAY_2
+"""
+
+number = 9
+print(number)
+string = "9"
+print(string)
+
+number = int(string)
+print(number)
