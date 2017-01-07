@@ -238,9 +238,6 @@ class Ui_Form(object):
         self.grade_drop = QtGui.QComboBox(Form)
         self.grade_drop.setObjectName(_fromUtf8("grade_drop"))
         self.horizontalLayout_4.addWidget(self.grade_drop)
-        self.add_submit_btn = QtGui.QPushButton(Form)
-        self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
-        self.horizontalLayout_4.addWidget(self.add_submit_btn)
         self.verticalLayout_9.addLayout(self.horizontalLayout_4)
         self.label_9 = QtGui.QLabel(Form)
         self.label_9.setObjectName(_fromUtf8("label_9"))
@@ -248,6 +245,9 @@ class Ui_Form(object):
         self.unit_edit = QtGui.QLineEdit(Form)
         self.unit_edit.setObjectName(_fromUtf8("unit_edit"))
         self.verticalLayout_9.addWidget(self.unit_edit)
+        self.add_submit_btn = QtGui.QPushButton(Form)
+        self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
+        self.verticalLayout_9.addWidget(self.add_submit_btn)
         self.verticalLayout_3.addLayout(self.verticalLayout_9)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
@@ -358,10 +358,9 @@ class Ui_Form(object):
         self.verticalLayout_3.addWidget(self.form_table)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
-
+        self.non_generated_code()
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
-        self.non_generated_code()
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(_translate("Form", "Form", None))
@@ -370,8 +369,8 @@ class Ui_Form(object):
         self.label_5.setText(_translate("Form", "last Name:", None))
         self.label_7.setText(_translate("Form", "First Name:", None))
         self.label_8.setText(_translate("Form", "Middle Initial", None))
-        self.add_submit_btn.setText(_translate("Form", "Add", None))
         self.label_9.setText(_translate("Form", "Unit", None))
+        self.add_submit_btn.setText(_translate("Form", "Add", None))
         self.label_2.setText(_translate("Form", "From", None))
         self.from_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
         self.label.setText(_translate("Form", "To", None))
@@ -385,7 +384,6 @@ class Ui_Form(object):
         self.total_hours.setDisplayFormat(_translate("Form", "h", None))
         self.submit_btn.setText(_translate("Form", "Submit", None))
         self.remarksLabel.setText(_translate("Form", "Remarks:", None))
-
 
 
 
@@ -437,7 +435,7 @@ class Ui_Form(object):
         self.leave_form.from_time = self.from_time.time().toPyTime().strftime("%H%M")
         self.leave_form.to_time = self.to_time.time().toPyTime().strftime("%H%M")
         self.leave_form.remarks = self.remarksText.toPlainText()
-        self.leave_form.hours = self.total_hours.time().toPyTime().strftime("%H")
+        self.leave_form.hours = self.total_hours.time().toPyTime().strftime("%H").lstrip('0')
         self.leave_form.leave_type = ""
         self.leave_form.signed = ""
         self.leave_form.create_form()

@@ -113,13 +113,6 @@
        <item>
         <widget class="QComboBox" name="grade_drop"/>
        </item>
-       <item>
-        <widget class="QPushButton" name="add_submit_btn">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
@@ -131,6 +124,13 @@
      </item>
      <item>
       <widget class="QLineEdit" name="unit_edit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add_submit_btn">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
