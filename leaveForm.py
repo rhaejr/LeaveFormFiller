@@ -459,7 +459,6 @@ class Ui_Form(object):
                          self.leave_form.hours))
         conn.commit()
 
-        os.system("start output.pdf")
         if self.check_aftp.isChecked():
             a1 = self.aftp_code.currentText()
             t1 = self.tng_code.currentText()
@@ -524,8 +523,10 @@ class Ui_Form(object):
                 ("NON_PAY_2]", "")]
 
             self.aftp_slip.create_form(self.aftp_data)
-            os.system("start outputAFTP.pdf")
-
+            os.system("pdftk output.pdf outputAFTP.pdf cat output outputboth.pdf")
+            os.system("start outputboth.pdf")
+        else:
+            os.system("start output.pdf")
     def logic(self):
         if self.check_aftp.isChecked():
             self.remarksText.setPlainText("Military Leave for AFTP support")
