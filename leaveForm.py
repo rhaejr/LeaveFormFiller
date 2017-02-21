@@ -578,6 +578,9 @@ class Ui_Form(object):
         cur.execute('''SELECT * FROM users''')
         rows = cur.fetchall()
         for row in rows:
+            row = list(row)
+            if len(str(row[0])) == 3:
+                row[0] = '0' + str(row[0])
             # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
             self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1], row[2], row[3], str(row[0]))
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
