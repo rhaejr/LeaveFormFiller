@@ -481,22 +481,22 @@ class Ui_Form(object):
             cur.execute("SELECT grade, unit FROM users WHERE ssn=" + self.leave_form.ssn)
             grade, unit = cur.fetchall()[0]
 
-            if day_of_week(self.leave_form.from_date) == "Thur":
-                if periods == "Single":
-                    from_time = "1630"
-                else:
-                    from_time = "1230"
-                to_time = "2100"
+            # if day_of_week(self.leave_form.from_date) == "Thur":
+            #     if periods == "Single":
+            #         from_time = "1630"
+            #     else:
+            #         from_time = "1230"
+            #     to_time = "2100"
 
-            elif day_of_week(self.leave_form.from_date) == "Sun":
+            if day_of_week(self.leave_form.from_date) == "Sun":
                 from_time = "0730"
                 if periods == "Single":
                     to_time = "1130"
                 else:
                     to_time = "1600"
             else:
-                from_time = "1430"
-                to_time = "2300"
+                from_time = "1530"
+                to_time = "2330"
 
 
 
