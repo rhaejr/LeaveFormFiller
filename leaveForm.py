@@ -4,6 +4,9 @@ import subprocess
 from PyQt4 import QtCore, QtGui
 import sys
 import os
+from PyQt4 import Qt
+from PyQt4.uic import loadUi
+from gui4 import  Ui_MainWindow
 import sqlite3
 from collections import OrderedDict
 
@@ -78,21 +81,9 @@ hours INT    NOT NULL,
 FOREIGN KEY(id) REFERENCES users(ssn)
 );''')
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
 
 
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+
 
 
 class AftpSlip:
@@ -125,7 +116,7 @@ class LeaveForm:
         self.datas.append((NAME, self.name))
         self.datas.append((SSN, self.ssn))
 
-        if self.gui.radio_annual.isChecked():
+        if self.gui.ui.radio_annual.isChecked():
             self.datas.append((ANNUAL_FROM_DATE, self.from_date))
             self.datas.append((ANNUAL_TO_DATE, self.to_date))
             self.datas.append((ANNUAL_BOX, 1))
@@ -133,7 +124,7 @@ class LeaveForm:
             self.datas.append((ANNUAL_TO_TIME, self.to_time))
             self.datas.append((ANNUAL_TOTAL, self.hours))
 
-        elif self.gui.radio_sick.isChecked():
+        elif self.gui.ui.radio_sick.isChecked():
             self.datas.append((SICK_FROM_DATE, self.from_date))
             self.datas.append((SICK_TO_DATE, self.to_date))
             self.datas.append((SICK_BOX, 1))
@@ -142,7 +133,7 @@ class LeaveForm:
             self.datas.append((SICK_TOTAL, self.hours))
 
 
-        elif self.gui.radio_lwop.isChecked():
+        elif self.gui.ui.radio_lwop.isChecked():
             self.datas.append((LWOP_FROM_DATE, self.from_date))
             self.datas.append((LWOP_TO_DATE, self.to_date))
             self.datas.append((LWOP_BOX, 1))
@@ -150,7 +141,15 @@ class LeaveForm:
             self.datas.append((LWOP_TO_TIME, self.to_time))
             self.datas.append((LWOP_TOTAL, self.hours))
 
-        elif self.gui.radio_mil.isChecked():
+        elif self.gui.ui.radio_comp.isChecked():
+            self.datas.append((COMP_FROM_DATE, self.from_date))
+            self.datas.append((COMP_TO_DATE, self.to_date))
+            self.datas.append((COMP_BOX, 1))
+            self.datas.append((COMP_FROM_TIME, self.from_time))
+            self.datas.append((COMP_TO_TIME, self.to_time))
+            self.datas.append((COMP_TOTAL, self.hours))
+
+        elif self.gui.ui.radio_mil.isChecked():
             self.datas.append((OTHER_FROM_DATE, self.from_date))
             self.datas.append((OTHER_TO_DATE, self.to_date))
             self.datas.append((OTHER_BOX, 1))
@@ -166,228 +165,12 @@ class LeaveForm:
         fdf_file.close()
         subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
 
+class Main(Qt.QMainWindow, Ui_MainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName(_fromUtf8("Form"))
-        Form.resize(787, 601)
-        self.verticalLayout_3 = QtGui.QVBoxLayout(Form)
-        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
-        self.label_6 = QtGui.QLabel(Form)
-        self.label_6.setObjectName(_fromUtf8("label_6"))
-        self.verticalLayout_3.addWidget(self.label_6)
-        self.user_list = QtGui.QComboBox(Form)
-        self.user_list.setObjectName(_fromUtf8("user_list"))
-        self.verticalLayout_3.addWidget(self.user_list)
-        self.verticalLayout_9 = QtGui.QVBoxLayout()
-        self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
-        self.horizontalLayout_4 = QtGui.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
-        self.verticalLayout_4 = QtGui.QVBoxLayout()
-        self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
-        self.label_4 = QtGui.QLabel(Form)
-        self.label_4.setObjectName(_fromUtf8("label_4"))
-        self.verticalLayout_4.addWidget(self.label_4)
-        self.add_last4_line = QtGui.QLineEdit(Form)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.add_last4_line.sizePolicy().hasHeightForWidth())
-        self.add_last4_line.setSizePolicy(sizePolicy)
-        self.add_last4_line.setMaximumSize(QtCore.QSize(326, 16777215))
-        self.add_last4_line.setObjectName(_fromUtf8("add_last4_line"))
-        self.verticalLayout_4.addWidget(self.add_last4_line)
-        self.horizontalLayout_4.addLayout(self.verticalLayout_4)
-        self.verticalLayout_5 = QtGui.QVBoxLayout()
-        self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
-        self.label_5 = QtGui.QLabel(Form)
-        self.label_5.setObjectName(_fromUtf8("label_5"))
-        self.verticalLayout_5.addWidget(self.label_5)
-        self.add_last_line = QtGui.QLineEdit(Form)
-        self.add_last_line.setObjectName(_fromUtf8("add_last_line"))
-        self.verticalLayout_5.addWidget(self.add_last_line)
-        self.horizontalLayout_4.addLayout(self.verticalLayout_5)
-        self.verticalLayout_6 = QtGui.QVBoxLayout()
-        self.verticalLayout_6.setObjectName(_fromUtf8("verticalLayout_6"))
-        self.label_7 = QtGui.QLabel(Form)
-        self.label_7.setObjectName(_fromUtf8("label_7"))
-        self.verticalLayout_6.addWidget(self.label_7)
-        self.add_first_line = QtGui.QLineEdit(Form)
-        self.add_first_line.setObjectName(_fromUtf8("add_first_line"))
-        self.verticalLayout_6.addWidget(self.add_first_line)
-        self.horizontalLayout_4.addLayout(self.verticalLayout_6)
-        self.verticalLayout_7 = QtGui.QVBoxLayout()
-        self.verticalLayout_7.setObjectName(_fromUtf8("verticalLayout_7"))
-        self.label_8 = QtGui.QLabel(Form)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
-        self.label_8.setSizePolicy(sizePolicy)
-        self.label_8.setObjectName(_fromUtf8("label_8"))
-        self.verticalLayout_7.addWidget(self.label_8)
-        self.add_middle_line = QtGui.QLineEdit(Form)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.add_middle_line.sizePolicy().hasHeightForWidth())
-        self.add_middle_line.setSizePolicy(sizePolicy)
-        self.add_middle_line.setObjectName(_fromUtf8("add_middle_line"))
-        self.verticalLayout_7.addWidget(self.add_middle_line)
-        self.horizontalLayout_4.addLayout(self.verticalLayout_7)
-        self.grade_drop = QtGui.QComboBox(Form)
-        self.grade_drop.setObjectName(_fromUtf8("grade_drop"))
-        self.horizontalLayout_4.addWidget(self.grade_drop)
-        self.verticalLayout_9.addLayout(self.horizontalLayout_4)
-        self.label_9 = QtGui.QLabel(Form)
-        self.label_9.setObjectName(_fromUtf8("label_9"))
-        self.verticalLayout_9.addWidget(self.label_9)
-        self.unit_edit = QtGui.QLineEdit(Form)
-        self.unit_edit.setObjectName(_fromUtf8("unit_edit"))
-        self.verticalLayout_9.addWidget(self.unit_edit)
-        self.add_submit_btn = QtGui.QPushButton(Form)
-        self.add_submit_btn.setObjectName(_fromUtf8("add_submit_btn"))
-        self.verticalLayout_9.addWidget(self.add_submit_btn)
-        self.verticalLayout_3.addLayout(self.verticalLayout_9)
-        self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.verticalLayout_2 = QtGui.QVBoxLayout()
-        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
-        self.label_2 = QtGui.QLabel(Form)
-        self.label_2.setObjectName(_fromUtf8("label_2"))
-        self.verticalLayout_2.addWidget(self.label_2)
-        self.from_date = QtGui.QDateEdit(Form)
-        self.from_date.setCurrentSection(QtGui.QDateTimeEdit.DaySection)
-        self.from_date.setCalendarPopup(True)
-        self.from_date.setObjectName(_fromUtf8("from_date"))
-        self.verticalLayout_2.addWidget(self.from_date)
-        self.from_time = QtGui.QTimeEdit(Form)
-        self.from_time.setObjectName(_fromUtf8("from_time"))
-        self.verticalLayout_2.addWidget(self.from_time)
-        self.horizontalLayout.addLayout(self.verticalLayout_2)
-        self.verticalLayout = QtGui.QVBoxLayout()
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.label = QtGui.QLabel(Form)
-        self.label.setObjectName(_fromUtf8("label"))
-        self.verticalLayout.addWidget(self.label)
-        self.to_date = QtGui.QDateEdit(Form)
-        self.to_date.setCalendarPopup(True)
-        self.to_date.setObjectName(_fromUtf8("to_date"))
-        self.verticalLayout.addWidget(self.to_date)
-        self.to_time = QtGui.QTimeEdit(Form)
-        self.to_time.setObjectName(_fromUtf8("to_time"))
-        self.verticalLayout.addWidget(self.to_time)
-        self.horizontalLayout.addLayout(self.verticalLayout)
-        self.horizontalLayout_2.addLayout(self.horizontalLayout)
-        self.verticalLayout_8 = QtGui.QVBoxLayout()
-        self.verticalLayout_8.setObjectName(_fromUtf8("verticalLayout_8"))
-        self.horizontalLayout_5 = QtGui.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
-        self.check_aftp = QtGui.QCheckBox(Form)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.check_aftp.sizePolicy().hasHeightForWidth())
-        self.check_aftp.setSizePolicy(sizePolicy)
-        self.check_aftp.setObjectName(_fromUtf8("check_aftp"))
-        self.horizontalLayout_5.addWidget(self.check_aftp)
-        self.gridLayout = QtGui.QGridLayout()
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.radio_sick = QtGui.QRadioButton(Form)
-        self.radio_sick.setObjectName(_fromUtf8("radio_sick"))
-        self.gridLayout.addWidget(self.radio_sick, 0, 3, 1, 1)
-        self.radio_lwop = QtGui.QRadioButton(Form)
-        self.radio_lwop.setObjectName(_fromUtf8("radio_lwop"))
-        self.gridLayout.addWidget(self.radio_lwop, 0, 4, 1, 1)
-        self.radio_annual = QtGui.QRadioButton(Form)
-        self.radio_annual.setObjectName(_fromUtf8("radio_annual"))
-        self.gridLayout.addWidget(self.radio_annual, 0, 1, 1, 1)
-        self.radio_mil = QtGui.QRadioButton(Form)
-        self.radio_mil.setObjectName(_fromUtf8("radio_mil"))
-        self.gridLayout.addWidget(self.radio_mil, 0, 2, 1, 1)
-        self.horizontalLayout_5.addLayout(self.gridLayout)
-        self.verticalLayout_8.addLayout(self.horizontalLayout_5)
-        self.horizontalLayout_6 = QtGui.QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
-        self.single_dual = QtGui.QComboBox(Form)
-        self.single_dual.setObjectName(_fromUtf8("single_dual"))
-        self.horizontalLayout_6.addWidget(self.single_dual)
-        self.aftp_code = QtGui.QComboBox(Form)
-        self.aftp_code.setObjectName(_fromUtf8("aftp_code"))
-        self.horizontalLayout_6.addWidget(self.aftp_code)
-        self.tng_code = QtGui.QComboBox(Form)
-        self.tng_code.setObjectName(_fromUtf8("tng_code"))
-        self.horizontalLayout_6.addWidget(self.tng_code)
-        self.verticalLayout_8.addLayout(self.horizontalLayout_6)
-        self.horizontalLayout_2.addLayout(self.verticalLayout_8)
-        self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-        self.label_3 = QtGui.QLabel(Form)
-        self.label_3.setObjectName(_fromUtf8("label_3"))
-        self.verticalLayout_3.addWidget(self.label_3)
-        self.horizontalLayout_3 = QtGui.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
-        self.total_hours = QtGui.QTimeEdit(Form)
-        self.total_hours.setObjectName(_fromUtf8("total_hours"))
-        self.horizontalLayout_3.addWidget(self.total_hours)
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem)
-        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
-        self.submit_btn = QtGui.QPushButton(Form)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.submit_btn.sizePolicy().hasHeightForWidth())
-        self.submit_btn.setSizePolicy(sizePolicy)
-        self.submit_btn.setAutoFillBackground(False)
-        self.submit_btn.setObjectName(_fromUtf8("submit_btn"))
-        self.verticalLayout_3.addWidget(self.submit_btn)
-        self.remarksLabel = QtGui.QLabel(Form)
-        self.remarksLabel.setObjectName(_fromUtf8("remarksLabel"))
-        self.verticalLayout_3.addWidget(self.remarksLabel)
-        self.remarksText = QtGui.QPlainTextEdit(Form)
-        self.remarksText.setEnabled(True)
-        self.remarksText.setMaximumSize(QtCore.QSize(16777215, 50))
-        self.remarksText.setObjectName(_fromUtf8("remarksText"))
-        self.verticalLayout_3.addWidget(self.remarksText)
-        self.form_table = QtGui.QTableWidget(Form)
-        self.form_table.setObjectName(_fromUtf8("form_table"))
-        self.form_table.setColumnCount(0)
-        self.form_table.setRowCount(0)
-        self.verticalLayout_3.addWidget(self.form_table)
-        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem1)
-        self.non_generated_code()
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
-
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(_translate("Form", "Form", None))
-        self.label_6.setText(_translate("Form", "Select Name", None))
-        self.label_4.setText(_translate("Form", "Last 4", None))
-        self.label_5.setText(_translate("Form", "last Name:", None))
-        self.label_7.setText(_translate("Form", "First Name:", None))
-        self.label_8.setText(_translate("Form", "Middle Initial", None))
-        self.label_9.setText(_translate("Form", "Unit", None))
-        self.add_submit_btn.setText(_translate("Form", "Add", None))
-        self.label_2.setText(_translate("Form", "From", None))
-        self.from_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
-        self.label.setText(_translate("Form", "To", None))
-        self.to_date.setDisplayFormat(_translate("Form", "dd-MMM-yyyy", None))
-        self.check_aftp.setText(_translate("Form", "AFTP", None))
-        self.radio_sick.setText(_translate("Form", "Sick", None))
-        self.radio_lwop.setText(_translate("Form", "LWOP", None))
-        self.radio_annual.setText(_translate("Form", "Annual", None))
-        self.radio_mil.setText(_translate("Form", "Military", None))
-        self.label_3.setText(_translate("Form", "Total Hours", None))
-        self.total_hours.setDisplayFormat(_translate("Form", "h", None))
-        self.submit_btn.setText(_translate("Form", "Submit", None))
-        self.remarksLabel.setText(_translate("Form", "Remarks:", None))
-
-
-
-    def non_generated_code(self):
         self.connections()
         self.defaults()
         self.logic()
@@ -399,31 +182,31 @@ class Ui_Form(object):
     # noinspection PyUnresolvedReferences
     def connections(self):
 
-        self.submit_btn.clicked.connect(self.submit_leave)
-        self.check_aftp.clicked.connect(self.logic)
-        self.radio_mil.clicked.connect(self.logic)
-        self.radio_sick.clicked.connect(self.logic)
-        self.radio_lwop.clicked.connect(self.logic)
-        self.radio_annual.clicked.connect(self.logic)
-        self.from_time.timeChanged.connect(self.update_hours)
-        self.to_time.timeChanged.connect(self.update_hours)
-        self.add_submit_btn.clicked.connect(self.add_user)
-        self.user_list.activated[str].connect(self.user_select)
+        self.ui.submit_btn.clicked.connect(self.submit_leave)
+        self.ui.check_aftp.clicked.connect(self.logic)
+        self.ui.radio_mil.clicked.connect(self.logic)
+        self.ui.radio_sick.clicked.connect(self.logic)
+        self.ui.radio_lwop.clicked.connect(self.logic)
+        self.ui.radio_annual.clicked.connect(self.logic)
+        self.ui.from_time.timeChanged.connect(self.update_hours)
+        self.ui.to_time.timeChanged.connect(self.update_hours)
+        self.ui.add_submit_btn.clicked.connect(self.add_user)
+        self.ui.user_list.activated[str].connect(self.user_select)
 
     def defaults(self):
-        self.from_date.setDate(QtCore.QDate.currentDate())
-        self.to_date.setDate(QtCore.QDate.currentDate())
-        self.from_time.setTime(QtCore.QTime(7, 0, 0))
-        self.to_time.setTime(QtCore.QTime(16, 30, 0))
+        self.ui.from_date.setDate(QtCore.QDate.currentDate())
+        self.ui.to_date.setDate(QtCore.QDate.currentDate())
+        self.ui.from_time.setTime(QtCore.QTime(7, 0, 0))
+        self.ui.to_time.setTime(QtCore.QTime(16, 30, 0))
         self.user_dict = {}
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[0]))
-        self.single_dual.addItem("Periods...")
-        self.single_dual.addItems(["Single", "Dual"])
-        self.aftp_code.addItem("AFTP Code...")
-        self.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
-        self.tng_code.addItem("TNG Code...")
-        self.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
-        self.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
+        self.ui.single_dual.addItem("Periods...")
+        self.ui.single_dual.addItems(["Single", "Dual"])
+        self.ui.aftp_code.addItem("AFTP Code...")
+        self.ui.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
+        self.ui.tng_code.addItem("TNG Code...")
+        self.ui.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
+        self.ui.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
                                   "WO1","CW2","CW3","CW4","CW5",
                                   "O-1","O-2","O-3","O-4","O-5","O-6","O-7","O-8","O-9"])
 
@@ -459,7 +242,7 @@ class Ui_Form(object):
                          self.leave_form.hours))
         conn.commit()
 
-        if self.check_aftp.isChecked():
+        if self.ui.check_aftp.isChecked():
             a1 = self.aftp_code.currentText()
             t1 = self.tng_code.currentText()
             p1 = "X"
@@ -469,11 +252,11 @@ class Ui_Form(object):
             p3 = ""
             periods = self.single_dual.currentText()
 
-            if self.aftp_code.currentText() == "AFTP Code...":
+            if self.ui.aftp_code.currentText() == "AFTP Code...":
                 a1, a2 = ("L", "L")
-            if self.tng_code.currentText() == "TNG Code...":
+            if self.ui.tng_code.currentText() == "TNG Code...":
                 t1, t2 = ("SPT", "SPT")
-            if self.single_dual.currentText() == "Periods...":
+            if self.ui.single_dual.currentText() == "Periods...":
                 periods = "Dual"
             if periods == "Single":
                 a2, t2, p2, p3 = ("", "", "", "X")
@@ -528,33 +311,33 @@ class Ui_Form(object):
         else:
             os.system("start output.pdf")
     def logic(self):
-        if self.check_aftp.isChecked():
-            self.remarksText.setPlainText("Military Leave for AFTP support")
-            self.from_time.setTime(QtCore.QTime(15, 30, 0))
-            self.to_time.setTime(QtCore.QTime(16, 30, 0))
+        if self.ui.check_aftp.isChecked():
+            self.ui.remarksText.setPlainText("Military Leave for AFTP support")
+            self.ui.from_time.setTime(QtCore.QTime(15, 30, 0))
+            self.ui.to_time.setTime(QtCore.QTime(16, 30, 0))
             # self.radio_mil.setChecked(True)
-            self.remarksText.update()
+            self.ui.remarksText.update()
 
 
     def update_hours(self):
-        from_time = self.from_time.time().toPyTime().strftime("%H%M")
-        to_time = self.to_time.time().toPyTime().strftime("%H%M")
-        self.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time, to_time), 0, 0))
+        from_time = self.ui.from_time.time().toPyTime().strftime("%H%M")
+        to_time = self.ui.to_time.time().toPyTime().strftime("%H%M")
+        self.ui.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time, to_time), 0, 0))
 
     def add_user(self):
 
-        first = self.add_first_line.text()
-        last = self.add_last_line.text()
-        middle = self.add_middle_line.text()
-        ssn = self.add_last4_line.text()
-        grade = self.grade_drop.currentText()
-        unit = self.unit_edit.text()
+        first = self.ui.add_first_line.text()
+        last = self.ui.add_last_line.text()
+        middle = self.ui.add_middle_line.text()
+        ssn = self.ui.add_last4_line.text()
+        grade = self.ui.grade_drop.currentText()
+        unit = self.ui.unit_edit.text()
 
         try:
             cur.execute("INSERT INTO users VALUES(" + ssn + ", '" + last + "', '" + first + "', '" + middle + "', '"
                         + grade + "', '" + unit + "')")
             conn.commit()
-            self.user_list.clear()
+            self.ui.user_list.clear()
             self.fill_drop_down()
         except sqlite3.IntegrityError:
             self.update_user(ssn, last, first, middle, grade, unit)
@@ -568,7 +351,7 @@ class Ui_Form(object):
             print("yes")
             cur.execute("UPDATE users SET last=?, first=?, middle=?, grade=?, unit=? WHERE ssn=?", (last, first, middle, grade, unit, ssn))
             conn.commit()
-            self.user_list.clear()
+            self.ui.user_list.clear()
             self.fill_drop_down()
 
         else:
@@ -584,9 +367,9 @@ class Ui_Form(object):
             # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
             self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1], row[2], row[3], str(row[0]))
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
-        self.user_list.addItem("Select user...")
+        self.ui.user_list.addItem("Select user...")
         for key in self.user_dict:
-            self.user_list.addItem(self.user_dict[key])
+            self.ui.user_list.addItem(self.user_dict[key])
 
     def user_select(self, text):
         if text == "Select user...":
@@ -595,19 +378,19 @@ class Ui_Form(object):
         cur.execute(
             "SELECT from_date, to_date,from_time,to_time,leave_type,remarks,signed,hours  FROM leave_forms WHERE ID=" + self.leave_form.ssn)
         rows = cur.fetchall()
-        self.form_table.setRowCount(len(rows))
+        self.ui.form_table.setRowCount(len(rows))
         try:
-            self.form_table.setColumnCount(len(rows[0]))
+            self.ui.form_table.setColumnCount(len(rows[0]))
         except IndexError:
-            self.form_table.setColumnCount(11)
+            self.ui.form_table.setColumnCount(11)
         row_num = 0
         for row in rows:
             column = 0
             for cell in row:
-                self.form_table.setItem(row_num, column, QtGui.QTableWidgetItem(str(cell)))
+                self.ui.form_table.setItem(row_num, column, QtGui.QTableWidgetItem(str(cell)))
                 column += 1
             row_num += 1
-        self.form_table.setHorizontalHeaderLabels(
+        self.ui.form_table.setHorizontalHeaderLabels(
             ['from date', 'to date', 'from time', 'to time', 'leave type', 'remarks', 'signed', 'hours'])
 
         # for row in rows:
@@ -646,10 +429,13 @@ def hours_of_leave(from_time, to_time):
     return int((delta.total_seconds() / minutes) / hours)
 
 
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    Form = QtGui.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
+def main():
+    app = Qt.QApplication(sys.argv)
+    main_view = Main()
+    main_view.show()
+
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()
