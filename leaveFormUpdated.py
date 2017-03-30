@@ -6,7 +6,7 @@ import sys
 import os
 from PyQt4 import Qt
 from PyQt4.uic import loadUi
-from gui4 import  Ui_Form
+from gui4 import  Ui_MainWindow
 import sqlite3
 from collections import OrderedDict
 
@@ -116,7 +116,7 @@ class LeaveForm:
         self.datas.append((NAME, self.name))
         self.datas.append((SSN, self.ssn))
 
-        if self.gui.radio_annual.isChecked():
+        if self.gui.ui.radio_annual.isChecked():
             self.datas.append((ANNUAL_FROM_DATE, self.from_date))
             self.datas.append((ANNUAL_TO_DATE, self.to_date))
             self.datas.append((ANNUAL_BOX, 1))
@@ -124,7 +124,7 @@ class LeaveForm:
             self.datas.append((ANNUAL_TO_TIME, self.to_time))
             self.datas.append((ANNUAL_TOTAL, self.hours))
 
-        elif self.gui.radio_sick.isChecked():
+        elif self.gui.ui.radio_sick.isChecked():
             self.datas.append((SICK_FROM_DATE, self.from_date))
             self.datas.append((SICK_TO_DATE, self.to_date))
             self.datas.append((SICK_BOX, 1))
@@ -133,7 +133,7 @@ class LeaveForm:
             self.datas.append((SICK_TOTAL, self.hours))
 
 
-        elif self.gui.radio_lwop.isChecked():
+        elif self.gui.ui.radio_lwop.isChecked():
             self.datas.append((LWOP_FROM_DATE, self.from_date))
             self.datas.append((LWOP_TO_DATE, self.to_date))
             self.datas.append((LWOP_BOX, 1))
@@ -141,7 +141,15 @@ class LeaveForm:
             self.datas.append((LWOP_TO_TIME, self.to_time))
             self.datas.append((LWOP_TOTAL, self.hours))
 
-        elif self.gui.radio_mil.isChecked():
+        elif self.gui.ui.radio_comp.isChecked():
+            self.datas.append((COMP_FROM_DATE, self.from_date))
+            self.datas.append((COMP_TO_DATE, self.to_date))
+            self.datas.append((COMP_BOX, 1))
+            self.datas.append((COMP_FROM_TIME, self.from_time))
+            self.datas.append((COMP_TO_TIME, self.to_time))
+            self.datas.append((COMP_TOTAL, self.hours))
+
+        elif self.gui.ui.radio_mil.isChecked():
             self.datas.append((OTHER_FROM_DATE, self.from_date))
             self.datas.append((OTHER_TO_DATE, self.to_date))
             self.datas.append((OTHER_BOX, 1))
@@ -157,10 +165,10 @@ class LeaveForm:
         fdf_file.close()
         subprocess.call(["pdftk", "leaveForm.pdf", "fill_form", "data.fdf", "output", "output.pdf", "flatten"])
 
-class Main(Qt.QMainWindow, Ui_Form):
+class Main(Qt.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.ui = Ui_Form()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.connections()
@@ -186,19 +194,19 @@ class Main(Qt.QMainWindow, Ui_Form):
         self.ui.user_list.activated[str].connect(self.user_select)
 
     def defaults(self):
-        self.from_date.setDate(QtCore.QDate.currentDate())
-        self.to_date.setDate(QtCore.QDate.currentDate())
-        self.from_time.setTime(QtCore.QTime(7, 0, 0))
-        self.to_time.setTime(QtCore.QTime(16, 30, 0))
+        self.ui.from_date.setDate(QtCore.QDate.currentDate())
+        self.ui.to_date.setDate(QtCore.QDate.currentDate())
+        self.ui.from_time.setTime(QtCore.QTime(7, 0, 0))
+        self.ui.to_time.setTime(QtCore.QTime(16, 30, 0))
         self.user_dict = {}
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[0]))
-        self.single_dual.addItem("Periods...")
-        self.single_dual.addItems(["Single", "Dual"])
-        self.aftp_code.addItem("AFTP Code...")
-        self.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
-        self.tng_code.addItem("TNG Code...")
-        self.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
-        self.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
+        self.ui.single_dual.addItem("Periods...")
+        self.ui.single_dual.addItems(["Single", "Dual"])
+        self.ui.aftp_code.addItem("AFTP Code...")
+        self.ui.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
+        self.ui.tng_code.addItem("TNG Code...")
+        self.ui.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
+        self.ui.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
                                   "WO1","CW2","CW3","CW4","CW5",
                                   "O-1","O-2","O-3","O-4","O-5","O-6","O-7","O-8","O-9"])
 
@@ -234,7 +242,7 @@ class Main(Qt.QMainWindow, Ui_Form):
                          self.leave_form.hours))
         conn.commit()
 
-        if self.check_aftp.isChecked():
+        if self.ui.check_aftp.isChecked():
             a1 = self.aftp_code.currentText()
             t1 = self.tng_code.currentText()
             p1 = "X"
@@ -244,11 +252,11 @@ class Main(Qt.QMainWindow, Ui_Form):
             p3 = ""
             periods = self.single_dual.currentText()
 
-            if self.aftp_code.currentText() == "AFTP Code...":
+            if self.ui.aftp_code.currentText() == "AFTP Code...":
                 a1, a2 = ("L", "L")
-            if self.tng_code.currentText() == "TNG Code...":
+            if self.ui.tng_code.currentText() == "TNG Code...":
                 t1, t2 = ("SPT", "SPT")
-            if self.single_dual.currentText() == "Periods...":
+            if self.ui.single_dual.currentText() == "Periods...":
                 periods = "Dual"
             if periods == "Single":
                 a2, t2, p2, p3 = ("", "", "", "X")
@@ -303,33 +311,33 @@ class Main(Qt.QMainWindow, Ui_Form):
         else:
             os.system("start output.pdf")
     def logic(self):
-        if self.check_aftp.isChecked():
-            self.remarksText.setPlainText("Military Leave for AFTP support")
-            self.from_time.setTime(QtCore.QTime(15, 30, 0))
-            self.to_time.setTime(QtCore.QTime(16, 30, 0))
+        if self.ui.check_aftp.isChecked():
+            self.ui.remarksText.setPlainText("Military Leave for AFTP support")
+            self.ui.from_time.setTime(QtCore.QTime(15, 30, 0))
+            self.ui.to_time.setTime(QtCore.QTime(16, 30, 0))
             # self.radio_mil.setChecked(True)
-            self.remarksText.update()
+            self.ui.remarksText.update()
 
 
     def update_hours(self):
-        from_time = self.from_time.time().toPyTime().strftime("%H%M")
-        to_time = self.to_time.time().toPyTime().strftime("%H%M")
-        self.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time, to_time), 0, 0))
+        from_time = self.ui.from_time.time().toPyTime().strftime("%H%M")
+        to_time = self.ui.to_time.time().toPyTime().strftime("%H%M")
+        self.ui.total_hours.setTime(QtCore.QTime(hours_of_leave(from_time, to_time), 0, 0))
 
     def add_user(self):
 
-        first = self.add_first_line.text()
-        last = self.add_last_line.text()
-        middle = self.add_middle_line.text()
-        ssn = self.add_last4_line.text()
-        grade = self.grade_drop.currentText()
-        unit = self.unit_edit.text()
+        first = self.ui.add_first_line.text()
+        last = self.ui.add_last_line.text()
+        middle = self.ui.add_middle_line.text()
+        ssn = self.ui.add_last4_line.text()
+        grade = self.ui.grade_drop.currentText()
+        unit = self.ui.unit_edit.text()
 
         try:
             cur.execute("INSERT INTO users VALUES(" + ssn + ", '" + last + "', '" + first + "', '" + middle + "', '"
                         + grade + "', '" + unit + "')")
             conn.commit()
-            self.user_list.clear()
+            self.ui.user_list.clear()
             self.fill_drop_down()
         except sqlite3.IntegrityError:
             self.update_user(ssn, last, first, middle, grade, unit)
@@ -343,7 +351,7 @@ class Main(Qt.QMainWindow, Ui_Form):
             print("yes")
             cur.execute("UPDATE users SET last=?, first=?, middle=?, grade=?, unit=? WHERE ssn=?", (last, first, middle, grade, unit, ssn))
             conn.commit()
-            self.user_list.clear()
+            self.ui.user_list.clear()
             self.fill_drop_down()
 
         else:
@@ -359,9 +367,9 @@ class Main(Qt.QMainWindow, Ui_Form):
             # self.user_list.addItem('{0} - {1}'.format(row[1], str(row[0])))
             self.user_dict[row[0]] = '{0}, {1} {2} - {3}'.format(row[1], row[2], row[3], str(row[0]))
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[1]))
-        self.user_list.addItem("Select user...")
+        self.ui.user_list.addItem("Select user...")
         for key in self.user_dict:
-            self.user_list.addItem(self.user_dict[key])
+            self.ui.user_list.addItem(self.user_dict[key])
 
     def user_select(self, text):
         if text == "Select user...":
@@ -370,19 +378,19 @@ class Main(Qt.QMainWindow, Ui_Form):
         cur.execute(
             "SELECT from_date, to_date,from_time,to_time,leave_type,remarks,signed,hours  FROM leave_forms WHERE ID=" + self.leave_form.ssn)
         rows = cur.fetchall()
-        self.form_table.setRowCount(len(rows))
+        self.ui.form_table.setRowCount(len(rows))
         try:
-            self.form_table.setColumnCount(len(rows[0]))
+            self.ui.form_table.setColumnCount(len(rows[0]))
         except IndexError:
-            self.form_table.setColumnCount(11)
+            self.ui.form_table.setColumnCount(11)
         row_num = 0
         for row in rows:
             column = 0
             for cell in row:
-                self.form_table.setItem(row_num, column, QtGui.QTableWidgetItem(str(cell)))
+                self.ui.form_table.setItem(row_num, column, QtGui.QTableWidgetItem(str(cell)))
                 column += 1
             row_num += 1
-        self.form_table.setHorizontalHeaderLabels(
+        self.ui.form_table.setHorizontalHeaderLabels(
             ['from date', 'to date', 'from time', 'to time', 'leave type', 'remarks', 'signed', 'hours'])
 
         # for row in rows:
