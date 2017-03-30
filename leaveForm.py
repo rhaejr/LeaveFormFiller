@@ -213,12 +213,12 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
 
     def submit_leave(self):
 
-        self.leave_form.from_date = self.from_date.date().toPyDate().strftime("%d-%b-%Y")
-        self.leave_form.to_date = self.to_date.date().toPyDate().strftime("%d-%b-%Y")
-        self.leave_form.from_time = self.from_time.time().toPyTime().strftime("%H%M")
-        self.leave_form.to_time = self.to_time.time().toPyTime().strftime("%H%M")
-        self.leave_form.remarks = self.remarksText.toPlainText()
-        self.leave_form.hours = self.total_hours.time().toPyTime().strftime("%H").lstrip('0')
+        self.leave_form.from_date = self.ui.from_date.date().toPyDate().strftime("%d-%b-%Y")
+        self.leave_form.to_date = self.ui.to_date.date().toPyDate().strftime("%d-%b-%Y")
+        self.leave_form.from_time = self.ui.from_time.time().toPyTime().strftime("%H%M")
+        self.leave_form.to_time = self.ui.to_time.time().toPyTime().strftime("%H%M")
+        self.leave_form.remarks = self.ui.remarksText.toPlainText()
+        self.leave_form.hours = self.ui.total_hours.time().toPyTime().strftime("%H").lstrip('0')
         self.leave_form.leave_type = ""
         self.leave_form.signed = ""
         self.leave_form.create_form()
@@ -243,11 +243,11 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
         conn.commit()
 
         if self.ui.check_aftp.isChecked():
-            a1 = self.aftp_code.currentText()
-            t1 = self.tng_code.currentText()
+            a1 = self.ui.aftp_code.currentText()
+            t1 = self.ui.tng_code.currentText()
             p1 = "X"
-            a2 = self.aftp_code.currentText()
-            t2 = self.tng_code.currentText()
+            a2 = self.ui.aftp_code.currentText()
+            t2 = self.ui.tng_code.currentText()
             p2 = "X"
             p3 = ""
             periods = self.single_dual.currentText()
