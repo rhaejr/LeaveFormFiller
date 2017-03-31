@@ -198,6 +198,13 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
         self.ui.to_date.setDate(QtCore.QDate.currentDate())
         self.ui.from_time.setTime(QtCore.QTime(7, 0, 0))
         self.ui.to_time.setTime(QtCore.QTime(16, 30, 0))
+        if day_of_week(self.ui.from_date.date().toPyDate().strftime("%d-%b-%Y")) == "Sun":
+            self.ui.aftp_from_time.setTime(QtCore.QTime(7, 30))
+            self.ui.aftp_to_time.setTime(QtCore.QTime(15,30))
+        else:
+            self.ui.aftp_from_time.setTime(QtCore.QTime(15, 30))
+            self.ui.aftp_to_time.setTime(QtCore.QTime(23, 30))
+
         self.user_dict = {}
         self.user_dict = OrderedDict(sorted(self.user_dict.items(), key=lambda t: t[0]))
         self.ui.single_dual.addItem("Periods...")
@@ -250,7 +257,7 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
             t2 = self.ui.tng_code.currentText()
             p2 = "X"
             p3 = ""
-            periods = self.single_dual.currentText()
+            periods = self.ui.single_dual.currentText()
 
             if self.ui.aftp_code.currentText() == "AFTP Code...":
                 a1, a2 = ("L", "L")
@@ -271,23 +278,23 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
             #         from_time = "1230"
             #     to_time = "2100"
 
-            if day_of_week(self.leave_form.from_date) == "Sun":
-                from_time = "0730"
-                if periods == "Single":
-                    to_time = "1130"
-                else:
-                    to_time = "1600"
-            else:
-                from_time = "1530"
-                to_time = "2330"
+            # if day_of_week(self.leave_form.from_date) == "Sun":
+            #     from_time = "0730"
+            #     if periods == "Single":
+            #         to_time = "1130"
+            #     else:
+            #         to_time = "1600"
+            # else:
+            #     from_time = "1530"
+            #     to_time = "2330"
 
 
 
             self.aftp_data = [
-                ("DATE", self.from_date.date().toPyDate().strftime("%d-%b-%Y")),
+                ("DATE", self.ui.from_date.date().toPyDate().strftime("%d-%b-%Y")),
                 ("SINGLE_DUAL", periods),
-                ("FROM", from_time),
-                ("TO", to_time),
+                ("FROM", self.ui.aftp_from_time.time().toPyTime().strftime("%H%M")),
+                ("TO", self.ui.aftp_to_time.time().toPyTime().strftime("%H%M")),
                 ("ORGANIZATION", unit),
                 ("SSN", self.leave_form.ssn),
                 ("GRADE", grade),

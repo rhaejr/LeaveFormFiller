@@ -51,3 +51,5 @@ data.fdf
 throwaway.py
 *.pyc
 users.db
+*.pyc
+*.db
