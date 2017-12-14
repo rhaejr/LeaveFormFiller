@@ -1,3 +1,3 @@
 import os
 
-os.system("python setup.py py2exe --includes sip")
+os.system("C:\\Python34-32\\python.exe setup.py py2exe --includes sip")

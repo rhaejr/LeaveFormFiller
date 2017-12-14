@@ -212,7 +212,8 @@ class Main(Qt.QMainWindow, Ui_MainWindow):
         self.ui.aftp_code.addItem("AFTP Code...")
         self.ui.aftp_code.addItems(["A","B","G","I","J","L","M","Q","R","S","T","V"])
         self.ui.tng_code.addItem("TNG Code...")
-        self.ui.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3"])
+        self.ui.tng_code.addItems(["AST","FDM","GSC","INF","MNT","MT1","SNF","OLT","SPT","WX","TD1","TD2","TD3","TD4",
+                                   "TD5","TD6","TD7","TD8","TD9","TD10","CK1","CK2","CK3","CK4","CK5","CK6"])
         self.ui.grade_drop.addItems(["E-1","E-2","E-3","E-4","E-5","E-6","E-7","E-8","E-9",
                                   "WO1","CW2","CW3","CW4","CW5",
                                   "O-1","O-2","O-3","O-4","O-5","O-6","O-7","O-8","O-9"])
